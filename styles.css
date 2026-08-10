@@ -1,0 +1,265 @@
+:root {
+  --bg-1: #f8f4e8;
+  --bg-2: #d8efe6;
+  --bg-3: #f2d9c8;
+  --table-green: #0f5d4c;
+  --table-green-soft: #1a7964;
+  --ink: #12322a;
+  --red: #b1293a;
+  --black: #152833;
+  --slot-border: rgba(255, 255, 255, 0.5);
+  --card: #fffefb;
+  --card-shadow: 0 9px 24px rgba(6, 30, 25, 0.2);
+  --selection: #ffd552;
+  --ok: #53b876;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: linear-gradient(
+    165deg,
+    var(--table-green-soft),
+    var(--table-green)
+  );
+  overflow-x: hidden;
+}
+
+.shell {
+  max-width: 1000px;
+  margin: 0 auto;
+  font-size: clamp(11px, 2vw, 16px);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button {
+  font-size: inherit;
+}
+
+.status {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.pill {
+  margin: auto;
+}
+
+.board {
+  container-type: inline-size;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(2 * var(--padding-height));
+  --card-width: 11cqw;
+  --card-height: 15.4cqw;
+  --padding-width: 0.75cqw;
+  --padding-height: 0.75cqw;
+  --card-font-size: 2cqw;
+  --card-shift: 2.5cqw;
+  --border-radius: 1cqw;
+  --card-padding: 0.5cqw;
+}
+
+@media (max-width: 480px) {
+  .board {
+    --card-width: 12.2cqw;
+    --card-height: 17.1cqw;
+    --padding-width: 0.15cqw;
+    --card-font-size: 5cqw;
+    --card-shift: 5.5cqw;
+  }
+}
+
+.pile {
+  --column: 0;
+  --row: 0;
+  transform: translate(
+    calc(
+      var(--padding-width) * (2 * var(--column) + 1) + 
+      var(--card-width) * var(--column)
+    ),
+    calc(
+      var(--row) * (var(--card-height) + 2 * var(--padding-height))
+    )
+  );
+  position: absolute;
+  z-index: 1;
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: var(--border-radius);
+}
+
+.pile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--slot-border);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.pile-symbol {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--card-font-size) * 2.5);
+  color: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+.card {
+  --column: 0;
+  --row: 0;
+  --depth: 0;
+  transform: translate(
+    calc(
+      var(--padding-width) * (2 * var(--column) + 1) + 
+      var(--card-width) * var(--column)
+    ),
+    calc(
+      var(--row) * (var(--card-height) + 2 * var(--padding-height)) +
+        var(--row) * var(--depth) * var(--card-shift)
+    )
+  );
+  z-index: calc(var(--depth) + 2);
+  position: absolute;
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(0, 0, 0, 0.22);
+  background: var(--card);
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--card-padding);
+  line-height: 1;
+  font-weight: 800;
+  font-size: var(--card-font-size);
+  transition: transform 170ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card.dragging {
+  transition: none;
+  z-index: calc(1000 + var(--depth));
+  cursor: grabbing;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}
+
+.card.red {
+  color: var(--red);
+}
+
+.card.black {
+  color: var(--black);
+}
+
+.highlighted {
+  outline: 3px solid var(--selection);
+  box-shadow:
+    0 0 0 3px rgba(0, 0, 0, 0.1),
+    0 10px 26px rgba(0, 0, 0, 0.25);
+}
+
+.corner {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2px;
+  z-index: 1;
+}
+
+.corner.bottom {
+  align-self: flex-end;
+  transform: rotate(180deg);
+}
+
+.hint {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 600;
+  animation: rise 580ms ease;
+  color: #164f41;
+  padding-inline: 2px;
+}
+
+.win-banner {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  background: rgba(6, 40, 31, 0.75);
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  backdrop-filter: blur(2px);
+}
+
+.win-banner.show {
+  display: flex;
+  animation: pop 260ms ease;
+}
+
+.win-card {
+  background: #fff;
+  color: #11352c;
+  border-radius: 16px;
+  padding: 22px 20px;
+  width: min(420px, 95%);
+}
+
+.win-card h2 {
+  margin: 0 0 8px;
+  font-family: "Fraunces", Georgia, serif;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
