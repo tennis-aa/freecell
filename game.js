@@ -138,17 +138,11 @@ class FreecellState {
     return null;
   }
 
-  samePosition(a, b) {
-    return a.type === b.type && a.key === b.key && a.depth === b.depth;
-  }
-
-  // Move forward
   tryMove(from, to) {
     if (!this.canMove(from, to)) {
       return null;
     }
 
-    // add depth for proper undoing
     if (to.type === "freecell") to.depth = 0;
     else if (to.type === "foundation")
       to.depth = this.foundations[to.key].length;
@@ -161,7 +155,6 @@ class FreecellState {
     return move;
   }
 
-  // No modification of the state, just check if move possible
   canMove(from, to) {
     if (from.type === to.type && from.key === to.key) {
       return false;
@@ -224,7 +217,6 @@ class FreecellState {
     return (freeSlots + 1) * 2 ** emptyCascades;
   }
 
-  // performs a move without checking if it is legal or adding to moves
   performMove(from, to) {
     const cards = this.cardsFrom(from);
 
@@ -246,12 +238,9 @@ class FreecellState {
   }
 
   solved() {
-    const done = SUITS.reduce(
-      (sum, suit) => sum + this.foundations[suit].length,
-      0,
+    return (
+      SUITS.reduce((sum, suit) => sum + this.foundations[suit].length, 0) === 52
     );
-    if (done === 52) return true;
-    return false;
   }
 
   canAutoToFoundation(card) {
@@ -519,8 +508,7 @@ function render() {
   updateWinBanner();
 }
 
-// Move cards without checking the validity of the move
-function Move(move, silent = false) {
+function renderMove(move, silent = false) {
   const from = move.from;
   const to = move.to;
   const cards = game.cardsFrom(to);
@@ -542,21 +530,22 @@ function Move(move, silent = false) {
   updateUndoButtonState();
   updateWinBanner();
   clearHintState();
+  clearHighlight();
 
-  if (silent) return;
-
-  let safeMove = game.foundationSafeMove();
-  if (safeMove) {
-    window.setTimeout(() => {
-      Move(safeMove);
-    }, 120);
+  if (!silent) {
+    let safeMove = game.foundationSafeMove();
+    if (safeMove) {
+      window.setTimeout(() => {
+        renderMove(safeMove);
+      }, 120);
+    }
   }
 }
 
 function undoMove() {
   const move = game.undo();
   if (move) {
-    Move({ from: move.to, to: move.from }, silent = true);
+    renderMove({ from: move.to, to: move.from }, true);
   }
 }
 
@@ -640,8 +629,6 @@ function onPointerDown(event) {
 
   cardEl.setPointerCapture(event.pointerId);
 
-  // moves the cardEl at (clientX, clientY) coordinates
-  // taking initial shifts into account
   function moveAt(clientX, clientY) {
     const anchorX = clientX - sourcePileRect.left - grabOffsetX;
     const anchorY = clientY - sourcePileRect.top - grabOffsetY;
@@ -663,7 +650,6 @@ function onPointerDown(event) {
     event.preventDefault(); // prevent scrolling on touchscreens
   }
 
-  // drop the cardEl, remove unneeded handlers
   function release(event) {
     cardEl.releasePointerCapture(event.pointerId);
 
@@ -687,12 +673,10 @@ function onPointerDown(event) {
       el.style.removeProperty("transform");
     });
 
-    if (move) Move(move);
+    if (move) renderMove(move);
   }
 
-  // move the cardEl on mousemove
   document.addEventListener("pointermove", onPointerMove);
-  // Listen globally so release still fires even when the dragged card ignores hit tests.
   document.addEventListener("pointerup", release, false);
   document.addEventListener("pointercancel", release, false);
 }
@@ -779,11 +763,9 @@ playAgainBtn.addEventListener("click", () => {
   render();
 });
 
-if (undoBtn) {
-  undoBtn.addEventListener("click", () => {
-    undoMove();
-  });
-}
+undoBtn.addEventListener("click", () => {
+  undoMove();
+});
 
 document.addEventListener("keydown", (event) => {
   const target = event.target;
