@@ -41,14 +41,54 @@ body {
   font-size: clamp(11px, 2vw, 16px);
 }
 
+.header {
+  margin-bottom: 8px;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
 }
 
 button {
+  min-height: 30px;
+  padding: 0 10px;
   font-size: inherit;
+  font-family: inherit;
+  font-weight: 800;
+  color: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
+  background: rgba(255, 254, 251, 0.92);
+  box-shadow: 0 3px 8px rgba(6, 30, 25, 0.16);
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease;
+}
+
+button:hover:not(:disabled) {
+  background: var(--card);
+  box-shadow: 0 5px 12px rgba(6, 30, 25, 0.2);
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  box-shadow: 0 2px 5px rgba(6, 30, 25, 0.16);
+  transform: translateY(0);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--selection);
+  outline-offset: 2px;
 }
 
 .status {
@@ -57,7 +97,42 @@ button {
 }
 
 .pill {
-  margin: auto;
+  min-height: 30px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 7px;
+  background: rgba(6, 40, 31, 0.22);
+  color: #f8f4e8;
+  font-size: 0.88em;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+#time-label {
+  min-width: 7.6em;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .controls {
+    gap: 4px;
+  }
+
+  button,
+  .pill {
+    min-height: 28px;
+  }
+
+  button {
+    padding-inline: 8px;
+  }
+
+  .pill {
+    padding-inline: 7px;
+  }
 }
 
 .board {
@@ -92,12 +167,10 @@ button {
   --row: 0;
   transform: translate(
     calc(
-      var(--padding-width) * (2 * var(--column) + 1) + 
-      var(--card-width) * var(--column)
+      var(--padding-width) * (2 * var(--column) + 1) + var(--card-width) *
+        var(--column)
     ),
-    calc(
-      var(--row) * (var(--card-height) + 2 * var(--padding-height))
-    )
+    calc(var(--row) * (var(--card-height) + 2 * var(--padding-height)))
   );
   position: absolute;
   z-index: 1;
@@ -133,8 +206,8 @@ button {
   --depth: 0;
   transform: translate(
     calc(
-      var(--padding-width) * (2 * var(--column) + 1) + 
-      var(--card-width) * var(--column)
+      var(--padding-width) * (2 * var(--column) + 1) + var(--card-width) *
+        var(--column)
     ),
     calc(
       var(--row) * (var(--card-height) + 2 * var(--padding-height)) +
