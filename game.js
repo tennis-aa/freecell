@@ -377,6 +377,7 @@ class Timer {
   setTickHandler(handler) {
     this.tickHandler = typeof handler === "function" ? handler : () => {};
   }
+
   startTimer() {
     this.stopTimer();
     this.startedAt = Date.now();
@@ -399,7 +400,6 @@ class Timer {
 const board = document.getElementById("board");
 const movesLabel = document.getElementById("moves-label");
 const timeLabel = document.getElementById("time-label");
-const remainingLabel = document.getElementById("remaining-label");
 const newGameBtn = document.getElementById("new-game-btn");
 const hintBtn = document.getElementById("hint-btn");
 const winBanner = document.getElementById("win-banner");
@@ -552,11 +552,6 @@ function undoMove() {
 function updateStatus() {
   movesLabel.textContent = `Moves: ${game.moves.length}`;
   timeLabel.textContent = `Time: ${formatSeconds(timer.elapsedSeconds)}`;
-  const done = SUITS.reduce(
-    (sum, suit) => sum + game.foundations[suit].length,
-    0,
-  );
-  remainingLabel.textContent = `Cards Remaining: ${52 - done}`;
 }
 
 function updateUndoButtonState() {
