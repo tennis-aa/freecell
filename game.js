@@ -354,7 +354,7 @@ class FreecellState {
   allAvailableMoves() {
     const possibleMoves = [];
     for (let key = 0; key < 8; ++key) {
-      for (let depth = 0; depth < this.cascades.length; ++depth) {
+      for (let depth = 0; depth < this.cascades[key].length; ++depth) {
         const from = { type: "cascade", key, depth };
         const toArray = this.availableMoves(from);
         for (const to of toArray) {
