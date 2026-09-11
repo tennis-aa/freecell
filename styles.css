@@ -38,7 +38,7 @@ body {
 .shell {
   max-width: 1000px;
   margin: 0 auto;
-  font-size: clamp(11px, 2vw, 16px);
+  font-size: clamp(14px, 2vw, 16px);
 }
 
 .header {
@@ -223,7 +223,6 @@ button:focus-visible {
   background: var(--card);
   user-select: none;
   touch-action: none;
-  cursor: grab;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -238,7 +237,6 @@ button:focus-visible {
 .card.dragging {
   transition: none;
   z-index: calc(1000 + var(--depth));
-  cursor: grabbing;
 }
 
 @media (prefers-reduced-motion: reduce) {

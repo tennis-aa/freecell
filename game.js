@@ -336,11 +336,18 @@ class FreecellState {
         }
       }
     }
-    possibleMoves.push(...nonEmptyCascadeMoves, ...emptyCascadeMoves);
-    for (let i = 0; i < 4; ++i) {
-      const to = { type: "freecell", key: i };
-      if (this.canMove(from, to)) possibleMoves.push(to);
-    }
+    possibleMoves.push(...nonEmptyCascadeMoves);
+    if (emptyCascadeMoves.length > 0)
+      possibleMoves.push(emptyCascadeMoves[0]);
+
+    if (from.type !== "freecell")
+      for (let i = 0; i < 4; ++i) {
+        const to = { type: "freecell", key: i };
+        if (this.canMove(from, to)) {
+          possibleMoves.push(to);
+          break;
+        }
+      }
     return possibleMoves;
   }
 
@@ -362,6 +369,12 @@ class FreecellState {
         possibleMoves.push({ from, to });
       }
     }
+    possibleMoves.sort((a,b) => {
+      if (a.to.type === "freecell" && b.to.type === "freecell") return 0;
+      else if (a.to.type === "freecell") return 1;
+      else if (b.to.type === "freecell") return -1;
+      return 0;
+    });
     return possibleMoves;
   }
 }
@@ -743,6 +756,9 @@ function updateHintState() {
 }
 
 newGameBtn.addEventListener("click", () => {
+  if (!window.confirm("Start a new game? Your current game will be lost.")) {
+    return;
+  }
   game.resetBoard();
   timer.startTimer();
   render();
